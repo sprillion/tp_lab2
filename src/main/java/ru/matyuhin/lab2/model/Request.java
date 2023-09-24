@@ -15,18 +15,18 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Request {
-    @NotBlank
-    @Size(max = 32)
+    @NotBlank(message = "UID не может быть пустым")
+    @Size(max = 32, message = "UID не может быть больше 32 символов")
     private String uid;
-    @NotBlank
-    @Size(max = 32)
+    @NotBlank(message = "operationUID не может быть пустым")
+    @Size(max = 32, message = "operationUID не может быть больше 32 символов")
     private String operationUid;
-    private String systemName;
-    @NotBlank
+    private Systems systemName;
+    @NotBlank(message = "systemTime не может быть пустым")
     private String systemTime;
     private String source;
-    @Min(1)
-    @Max(100000)
+    @Min(value = 1, message = "communicationId не может быть меньше 1")
+    @Max(value = 100000, message = "communicationId не может быть больше 1")
     private int communicationId;
     private int templateId;
     private int productCode;
