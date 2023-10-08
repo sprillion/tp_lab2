@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.matyuhin.lab2.exception.UnsupportedCodeException;
 import ru.matyuhin.lab2.exception.ValidationFailedException;
 import ru.matyuhin.lab2.model.*;
-import ru.matyuhin.lab2.service.ModifyResponseService;
-import ru.matyuhin.lab2.service.UnsupportedCodeService;
-import ru.matyuhin.lab2.service.ValidationService;
+import ru.matyuhin.lab2.service.*;
 import ru.matyuhin.lab2.util.DateTimeUtil;
 
 import javax.validation.Valid;
@@ -27,22 +25,25 @@ public class MyController {
     private final ValidationService validationService;
     private final UnsupportedCodeService unsupportedCodeService;
     private final ModifyResponseService modifyResponseService;
+    private final ModifyRequestService modifyRequestService;
 
     @Autowired
     public MyController(ValidationService validationService,
                         UnsupportedCodeService unsupportedCodeService,
-                        @Qualifier("ModifySystemTimeResponseService") ModifyResponseService modifyResponseService){
+                        @Qualifier("ModifySystemTimeResponseService") ModifyResponseService modifyResponseService,
+                        @Qualifier("ModifySystemTimeRequestService") ModifyRequestService modifyRequestService){
 
         this.validationService = validationService;
         this.unsupportedCodeService = unsupportedCodeService;
         this.modifyResponseService = modifyResponseService;
+        this.modifyRequestService = modifyRequestService;
     }
 
     @PostMapping(value = "/feedback")
     public ResponseEntity<Response> feedback(@Valid @RequestBody Request request, BindingResult bindingResult) {
 
+        modifyRequestService.modify(request);
         log.info("request: {}", request);
-
         Response response = Response.builder()
                 .uid(request.getUid())
                 .operationUid(request.getOperationUid())
@@ -76,9 +77,6 @@ public class MyController {
             log.error(ErrorCodes.UNKNOWN_EXCEPTION.toString());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        modifyResponseService.modify(response);
-
-        return new ResponseEntity<>(modifyResponseService.modify(response), HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
